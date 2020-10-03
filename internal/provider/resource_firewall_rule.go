@@ -56,6 +56,12 @@ func resourceFirewallRule() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringMatch(firewallRuleProtocolRegexp, "must be a valid protocol"),
 			},
+			"enabled": {
+				Description: "Specifies whether the rule should be enabled.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+			},
 
 			// sources
 			"src_network_id": {
@@ -178,7 +184,7 @@ func resourceFirewallRuleGetResourceData(d *schema.ResourceData) (*unifi.Firewal
 	}
 
 	return &unifi.FirewallRule{
-		Enabled:          true,
+		Enabled:          d.Get("enabled").(bool),
 		Name:             d.Get("name").(string),
 		Action:           d.Get("action").(string),
 		Ruleset:          d.Get("ruleset").(string),
@@ -206,6 +212,7 @@ func resourceFirewallRuleGetResourceData(d *schema.ResourceData) (*unifi.Firewal
 
 func resourceFirewallRuleSetResourceData(resp *unifi.FirewallRule, d *schema.ResourceData) error {
 	d.Set("name", resp.Name)
+	d.Set("enabled", resp.Enabled)
 	d.Set("action", resp.Action)
 	d.Set("ruleset", resp.Ruleset)
 	d.Set("rule_index", resp.RuleIndex)
